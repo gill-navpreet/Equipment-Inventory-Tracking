@@ -1,119 +1,111 @@
-var http = require('http');
-var fs = require('fs');
+//express module. serves the job for fd and html, makes code more managable.
+var express = require ('express');
+//handles directory pathing
+var path = require('path');
+//mysql module, allows for database access.
 var mysql = require ('mysql');
 
+
+//mysql connection through mysql workbench server
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'ecs193@@',
-    database: 'inventorytracking'
+    database: 'inventory'
 });
 
-connection.connect();
+//connects to mysql server
+connection.connect(function(err){
+    if(err){
+        console.log('Error connecting to database');
+        return;
+    }
+    console.log('Connection to database established');
+});
 
+//creates express object
+var app = express();
 
-
-var seanData = {
-    id: null,
-    name: 'Sean',
-    qrlcode: 9382792
+//data for entries. this needs to be stored in a json file that will be updated between front
+//end and backend.
+var data = [
+    {
+        id: null,
+        firstName: 'Sean',
+        lastName: 'Moody',
+        studentID: 45454545,
+        item: 'mouse',
+        qrlCode: 9382792,
+        checkOutTime: 600
+    },
+    {
+        id: null,
+        firstName: 'Weston',
+        lastName: 'Moody',
+        studentID: 78787878,
+        item: 'keyboard',
+        qrlCode: 9377777,
+        checkOutTime: 700
+    }
+];
+//mysql insert query function. Takes in table name, and entry of data
+var insertQuery = function(table,entry) {
+    connection.query('INSERT INTO ' + table + ' SET ?', entry, function(err,res){
+        if(err){
+            console.log('Error in insertQuery');
+            return;
+        }
+        console.log('Last insert ID:', res.insertId);
+    })
+};
+//mysql select query function. Selects from a table.
+var selectQuery = function(table) {
+    connection.query('SELECT * FROM ' + table,function(err,rows){
+        if(err){
+            console.log('Error in selectQuery');
+            return;
+        }
+        console.log('Data received from Db:\n');
+        console.log(rows);
+    })
+};
+//mysql delete query function. Deletes from a table by id
+var deleteQuery = function(table,id) {
+    connection.query('DELETE FROM ' + table + ' WHERE id = ?', id, function (err, result) {
+        if (err) {
+            console.log('Error in deleteQuery');
+            return;
+        }
+        console.log('Deleted ' + result.affectedRows + ' rows');
+    })
 };
 
-var westonData = {
-    id: null,
-    name: 'Weston',
-    qrlcode: 3729938
-}
 
-var selectQuery = function() {connection.query('select * from inventory', function (err,result) {
-    if(err){
-        console.error(err);
-        return;
-    }
-    console.log(result);
-});}
+//insertQuery('inventory', data[0]);
+//deleteQuery('inventory',[11]);
+//selectQuery('inventory');
 
 
-var seanQuery = function() {connection.query('insert into inventory set ?', seanData, function(err, result) {
-  if(err){
-      console.error(err);
-      return;
-  }
-  console.error(result);
-});}
+//home, access by localhost:3000
+//home is set up to enter in a data entry, but does not record it yet.
+app.get('/', function(req,res){
+    res.sendFile(path.join(__dirname + '/index.html'));
+    console.log("/ request");
+});
 
-var westonQuery = function() {connection.query('insert into inventory set ?', westonData, function(err, result) {
-    if(err){
-        console.error(err);
-        return;
-    }
-    console.error(result);
-});}
+//bootstrap example, access by localhost:3000/bootex
+app.get('/bootex', function(req,res){
+    res.sendFile(path.join(__dirname + '/bootstrap.html'));
+    console.log("/bootex request");
+});
 
-var deleteQuery = function() {
-    connection.query('delete from inventory where name = "Sean"', function (err,result) {
-        console.log(result);
-    });
-    connection.query('delete from inventory where name = "Weston"', function (err,result) {
-        console.log(result);
-    });
-}
+//error 404
+app.get('*', function(req,res){
+    res.send("Error, this is not a page you are looking for");
+});
 
-function onRequest(request,response){
-    if( request.method == 'GET' && request.url == '/'){
-        response.writeHead(200,{"Content-Type": "text/html"});
-        fs.createReadStream("./index.html").pipe(response);
-        console.log("Connected to Home");
-    }else{
+//this boots up the server and listens on port 3000
+app.listen(3000, function() {
+    console.log("Server is now running on localhost:3000");
+});
 
-    if(request.method == 'GET' && request.url == '/insertWeston'){
-        westonRequest(request,response);
-    }else{
-
-    if(request.method == 'GET' && request.url == '/insertSean'){
-        seanRequest(request,response);
-    }else {
-    if (request.method == 'GET' && request.url == '/deleteEntries') {
-        deleteRequest(request, response);
-    }else {
-        send404Response(response);
-    }
-    }
-    }
-    }
-
-}
-function westonRequest(request,response){
-    response.writeHead(200,{"Content-Type": "text/html"});
-    fs.createReadStream("./insertWeston.html").pipe(response);
-    console.log("Connected to westonRequest");
-    westonQuery();
-    selectQuery();
-}
-
-function seanRequest(request,response){
-    response.writeHead(200,{"Content-Type": "text/html"});
-    fs.createReadStream("./insertSean.html").pipe(response);
-    console.log("Connected to seanRequest");
-    seanQuery();
-    selectQuery();
-}
-
-function deleteRequest(request,response){
-    response.writeHead(200,{"Content-Type": "text/html"});
-    fs.createReadStream("./deleteEntries.html").pipe(response);
-    console.log("Connected to deleteRequest");
-    deleteQuery();
-    selectQuery();
-}
-
-//error response
-function send404Response(response){
-    response.writeHead(404, {"Content-Type": "text/plain"});
-    response.write("Error 404: Page not found!");
-    response.end();
-}
-
-
-http.createServer(onRequest).listen(8000);
-console.log("Server is now running....");
