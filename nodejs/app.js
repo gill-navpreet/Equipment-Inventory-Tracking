@@ -59,9 +59,15 @@ var deleteQuery = function() {
     });
 }
 
+// Request by user after connecting to server
 function onRequest(request,response){
+    //if user requests a home page
     if( request.method == 'GET' && request.url == '/'){
+        // Status code 200 means all good
+        // response type is a text file
         response.writeHead(200,{"Content-Type": "text/html"});
+        // Create a readable stream from index.html
+        // Send the response to the index.html file
         fs.createReadStream("./index.html").pipe(response);
         console.log("Connected to Home");
     }else{
@@ -76,6 +82,7 @@ function onRequest(request,response){
     if (request.method == 'GET' && request.url == '/deleteEntries') {
         deleteRequest(request, response);
     }else {
+        // Sends the error response
         send404Response(response);
     }
     }
@@ -114,6 +121,6 @@ function send404Response(response){
     response.end();
 }
 
-
+//Create server which listens for users to request through port 8000
 http.createServer(onRequest).listen(8000);
 console.log("Server is now running....");
