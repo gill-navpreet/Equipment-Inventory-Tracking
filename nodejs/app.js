@@ -79,8 +79,18 @@ var deleteQuery = function(table,id) {
         console.log('Deleted ' + result.affectedRows + ' rows');
     })
 };
+//mysql update query function.
+var updateQuery = function(table,dataType,dataName,id) {
+    connection.query('UPDATE ' + table + ' SET ' + dataType + ' = ? Where ID = ?',[dataName,id], function(err, result){
+        if(err) {
+            console.log('Error in updateQuery');
+            return;
+        }
+        console.log('Changed ' + result.changedRows + ' rows');
+    })
+};
 
-
+//updateQuery('inventory', 'firstName', 'Joseph', 12);
 //insertQuery('inventory', data[0]);
 //deleteQuery('inventory',[11]);
 //selectQuery('inventory');
@@ -92,6 +102,8 @@ app.get('/', function(req,res){
     res.sendFile(path.join(__dirname + '/index.html'));
     console.log("/ request");
 });
+
+
 
 //bootstrap example, access by localhost:3000/bootex
 app.get('/bootex', function(req,res){
