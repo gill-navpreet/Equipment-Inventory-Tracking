@@ -3,14 +3,16 @@
  *
  * status of project:
  * This project currently has the ability to connect to database (MySQL) server that communicates with nodejs (backend) server.
- * Has functions that can query database, but can only query by hardcoding the functions that are currently commented out.
+ * Has functions that can query database
+ *
  * We have the homepage set to index.html which provides us a form to fill out user information. This information is linked to a
- * submit button which isn't implemented to pass information to our backend. Our Angular (frontend) has the capability to retrieve
- * information from the nodejs server by importing a json file that is sent out through the bodyparser module.
+ * submit button which is implemented to send data to our backend through to the database.
+ *
+ * Our Angular (frontend) has the capability to retrieve information from the nodejs server by importing a json file that is sent
+ * out through the bodyparser module.
  *
  * TODO:
- * Need to figure out how to submit the information entered in the forms on Angular (frontend) to be readable for node js to
- * query database. Set up more buttons that can do the options that relate to the database for nodejs to handle. These buttons
+ * Set up more buttons that can do the options that relate to the database for nodejs to handle. These buttons
  * may include delete queries, select.
  *
  * We shouldn't be using the var data to store our entries, this is rather a simulation of a database for testing purposes only
@@ -126,6 +128,11 @@ var updateQuery = function(table,dataType,dataName,id) {
 //selectQuery('inventory');
 
 
+//this inserts into database from angular front end
+app.post('/api/entry', function(req,res,next){
+    var entry = req.body;
+    insertQuery('inventory',entry);
+});
 
 
 //home, access by localhost:3000

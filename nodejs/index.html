@@ -2,19 +2,18 @@
 <html>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-<script src="javascripts/app.js" type="text/javascript"></script>
 
 <body>
 <p>Here is an example of filling out an entry:</p>
 <div ng-app="myApp" ng-controller="myCtrl">
-    <form ng-submit="myFunc()">
+    <form>
         First Name: <input type="text" ng-model="firstName"><br>
         Last Name: <input type="text" ng-model="lastName"><br>
         Student ID: <input type="text" ng-model="studentID"><br>
         Item: <input type="text" ng-model="item"><br>
         QRL Code: <input type="text" ng-model="qrlCode"><br>
         Check out time: <input type="text" ng-model="checkOutTime"><br>
-        <input type="submit">
+        <input type="submit" value="Submit" ng-click="submit()">
         <p>{{myTxt}}</p>
 
     </form>
@@ -37,9 +36,14 @@
         </li>
     </ul>
 </div>
+</body>
 <script><!-- uses app in div scope above and myCntl as a controller-->
     var app = angular.module("myApp", []);
     app.controller("myCtrl", function($scope,$http) {//sets up controller with scope and http
+
+
+
+        //retrieves data from node.js variable. need to modify to retrieve from database
         $scope.data = [];
         var request = $http.get('/data');  //gets data from /data that node js generates
         request.success(function(data) {
@@ -48,10 +52,28 @@
         request.error(function(data){
             console.log('Error: ' + data);
         });
+
+
+        //submit inserts into database
         $scope.myTxt = "Please enter all fields";
-        $scope.myFunc = function () {
-            $scope.myTxt = "WIP// The submit feature doesn't work yet //WIP!";
-        }
+        $scope.submit = function(){
+            var obj = {
+                id: $scope.null,
+                firstName: $scope.firstName,
+                lastName: $scope.lastName,
+                studentID: $scope.studentID,
+                item: $scope.item,
+                qrlCode: $scope.qrlCode
+            };
+
+            var json = JSON.stringify(obj);
+
+            $scope.myTxt = "Entries added to database";
+            $http.post("/api/entry/", json).success(function(json,status){
+                console.log('Entry posted successfully');
+            })
+        };
+
     });
 </script>
 
