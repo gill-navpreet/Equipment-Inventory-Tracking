@@ -2,7 +2,7 @@
 <html>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-
+<script src="javascripts/app.js" type="text/javascript"></script>
 
 <body>
 <p>Here is an example of filling out an entry:</p>
@@ -23,15 +23,34 @@
     <h1>Student ID: {{studentID}}</h1>
     <h1>Item: {{item}}</h1>
     <h1>QRL Code: {{qrlCode}}</h1>
-    <h1>Check out time: {{checkOutTime}}</h1>
-
+    <h1>Check out time: {{checkOutTime}}</h1><!-- these are not the same variables as the x.data
+    variables from below. My goal is to have these variables be inputted into server after entering
+    information into form and submitting. Haven't done this yet and trying to figure out. -->
+    <ul ng-repeat="x in data"> <!-- displays the data that nodejs generated through json-->
+        <li>
+            {{x.firstName}},
+            {{x.lastName}},
+            {{x.studentID}},
+            {{x.item}},
+            {{x.qrlCode}},
+            {{x.checkOutTime}}
+        </li>
+    </ul>
 </div>
-<script>
+<script><!-- uses app in div scope above and myCntl as a controller-->
     var app = angular.module("myApp", []);
-    app.controller("myCtrl", function($scope) {
+    app.controller("myCtrl", function($scope,$http) {//sets up controller with scope and http
+        $scope.data = [];
+        var request = $http.get('/data');  //gets data from /data that node js generates
+        request.success(function(data) {
+            $scope.data = data;
+        });
+        request.error(function(data){
+            console.log('Error: ' + data);
+        });
         $scope.myTxt = "Please enter all fields";
         $scope.myFunc = function () {
-            $scope.myTxt = "You clicked submit!";
+            $scope.myTxt = "WIP// The submit feature doesn't work yet //WIP!";
         }
     });
 </script>

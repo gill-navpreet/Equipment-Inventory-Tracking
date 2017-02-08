@@ -1,10 +1,37 @@
+/**
+ * ECS 193A Inventory Tracking
+ *
+ * status of project:
+ * This project currently has the ability to connect to database (MySQL) server that communicates with nodejs (backend) server.
+ * Has functions that can query database, but can only query by hardcoding the functions that are currently commented out.
+ * We have the homepage set to index.html which provides us a form to fill out user information. This information is linked to a
+ * submit button which isn't implemented to pass information to our backend. Our Angular (frontend) has the capability to retrieve
+ * information from the nodejs server by importing a json file that is sent out through the bodyparser module.
+ *
+ * TODO:
+ * Need to figure out how to submit the information entered in the forms on Angular (frontend) to be readable for node js to
+ * query database. Set up more buttons that can do the options that relate to the database for nodejs to handle. These buttons
+ * may include delete queries, select.
+ *
+ * We shouldn't be using the var data to store our entries, this is rather a simulation of a database for testing purposes only
+ * We want to direct the information from the database to output on frontend index.html that can be manipulated by user
+ * input.
+ */
+
 //express module. serves the job for fd and html, makes code more managable.
 var express = require ('express');
 //handles directory pathing
 var path = require('path');
 //mysql module, allows for database access.
 var mysql = require ('mysql');
+//router
+var router = express.Router();
+//body parser
+var bodyParser = require('body-parser');
 
+
+//good practice when setting up port.
+var PORT = process.env.PORT || 3000;
 
 //mysql connection through mysql workbench server
 var connection = mysql.createConnection({
@@ -25,6 +52,9 @@ connection.connect(function(err){
 
 //creates express object
 var app = express();
+//sets up json generator through body parser
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //data for entries. this needs to be stored in a json file that will be updated between front
 //end and backend.
@@ -96,6 +126,8 @@ var updateQuery = function(table,dataType,dataName,id) {
 //selectQuery('inventory');
 
 
+
+
 //home, access by localhost:3000
 //home is set up to enter in a data entry, but does not record it yet.
 app.get('/', function(req,res){
@@ -104,6 +136,11 @@ app.get('/', function(req,res){
 });
 
 
+//passes data values into /data for front end to read data and display.
+app.get('/data', function(req,res){
+    res.json(data);
+    console.log("/data request");
+});
 
 //bootstrap example, access by localhost:3000/bootex
 app.get('/bootex', function(req,res){
@@ -117,7 +154,7 @@ app.get('*', function(req,res){
 });
 
 //this boots up the server and listens on port 3000
-app.listen(3000, function() {
-    console.log("Server is now running on localhost:3000");
+app.listen(PORT, function() {
+    console.log("Server running on " + PORT);
 });
 
