@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<body>
+<p>Here is an example of filling out an entry:</p>
+<div ng-app="myApp" ng-controller="myCtrl">
+    <form>
+        First Name: <input type="text" ng-model="firstName"><br>
+        Last Name: <input type="text" ng-model="lastName"><br>
+        Student ID: <input type="text" ng-model="studentID"><br>
+        Item: <input type="text" ng-model="item"><br>
+        QRL Code: <input type="text" ng-model="qrlCode"><br>
+        Check out time: <input type="text" ng-model="checkOutTime"><br>
+        <input type="submit" value="Submit" ng-click="submit()">
+        <p>{{myTxt}}</p>
+
+    </form>
+    <h1>First Name: {{firstName}}</h1>
+    <h1>Last Name: {{lastName}}</h1>
+    <h1>Student ID: {{studentID}}</h1>
+    <h1>Item: {{item}}</h1>
+    <h1>QRL Code: {{qrlCode}}</h1>
+    <h1>Check out time: {{checkOutTime}}</h1><!-- these are not the same variables as the x.data
+    variables from below. My goal is to have these variables be inputted into server after entering
+    information into form and submitting. Haven't done this yet and trying to figure out. -->
+    <ul ng-repeat="x in data"> <!-- displays the data that nodejs generated through json-->
+        <li>
+            {{x.firstName}},
+            {{x.lastName}},
+            {{x.studentID}},
+            {{x.item}},
+            {{x.qrlCode}},
+            {{x.checkOutTime}}
+        </li>
+    </ul>
+</div>
+</body>
+<script><!-- uses app in div scope above and myCntl as a controller-->
+    var app = angular.module("myApp", []);
+    app.controller("myCtrl", function($scope,$http) {//sets up controller with scope and http
+
+
+
+        //retrieves data from node.js variable. need to modify to retrieve from database
+        $scope.data = [];
+        var request = $http.get('/data');  //gets data from /data that node js generates
+        request.success(function(data) {
+            $scope.data = data;
+        });
+        request.error(function(data){
+            console.log('Error: ' + data);
+        });
+
+
+        //submit inserts into database
+        $scope.myTxt = "Please enter all fields";
+        $scope.submit = function(){
+            var obj = {
+                id: $scope.null,
+                firstName: $scope.firstName,
+                lastName: $scope.lastName,
+                studentID: $scope.studentID,
+                item: $scope.item,
+                qrlCode: $scope.qrlCode
+            };
+
+            var json = JSON.stringify(obj);
+
+            $scope.myTxt = "Entries added to database";
+            $http.post("/api/entry/", json).success(function(json,status){
+                console.log('Entry posted successfully');
+            })
+        };
+
+    });
+</script>
+
+</html>

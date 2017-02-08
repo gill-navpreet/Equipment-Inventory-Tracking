@@ -33,7 +33,7 @@ var bodyParser = require('body-parser');
 
 
 //good practice when setting up port.
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3003;
 
 //mysql connection through mysql workbench server
 var connection = mysql.createConnection({
@@ -138,10 +138,14 @@ app.post('/api/entry', function(req,res,next){
 //home, access by localhost:3000
 //home is set up to enter in a data entry, but does not record it yet.
 app.get('/', function(req,res){
-    res.sendFile(path.join(__dirname + '/index.html'));
+    res.sendFile(path.join(__dirname + '/home.html'));
     console.log("/ request");
 });
 
+app.get('/login', function(req,res){
+    res.sendFile(path.join(__dirname + '/index.html'));
+    console.log("/login request");
+});
 
 //passes data values into /data for front end to read data and display.
 app.get('/data', function(req,res){
