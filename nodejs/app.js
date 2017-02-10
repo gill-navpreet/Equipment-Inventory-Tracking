@@ -5,24 +5,31 @@
  * This project currently has the ability to connect to database (MySQL) server that communicates with nodejs (backend) server.
  * Has functions that can query database
  *
- * We have the homepage set to index.html which provides us a form to fill out user information. This information is linked to a
+ * We have the homepage set to home.html which provides us a form to fill out user information. This information is linked to a
  * submit button which is implemented to send data to our backend through to the database.
  *
  * Our Angular (frontend) has the capability to retrieve information from the nodejs server by importing a json file that is sent
- * out through the bodyparser module.
+ * out through the bodyparser module. The information from the database can be seen under the form when you load the page.
+ *
+ * when submitting information in the form on the webpage home.html, you must refresh the page to see the update.
  *
  * TODO:
  * Set up more buttons that can do the options that relate to the database for nodejs to handle. These buttons
- * may include delete queries, select.
+ * may include delete queries,
  *
- * We shouldn't be using the var data to store our entries, this is rather a simulation of a database for testing purposes only
- * We want to direct the information from the database to output on frontend index.html that can be manipulated by user
- * input.
+ * We want the entries to be updated through run time through the use of ???AJAX??? not sure how to do this, but will have to
+ * research, or some other implementation.
+ *
+ * We can experiment with bootstrap on the forms for now
+ *
+ * We want to separate home.html into two files. There exists a home.js, but it isn't up to date with home.html. I've
+ * struggled to separate the home.html file into a .js for some reason. This should be a simple fix, but is now a priority
+ *
  */
 
 //express module. serves the job for fd and html, makes code more managable.
 var express = require ('express');
-//handles directory pathing
+//handles directory pathing, not implemented, but we will need to use this in the future
 var path = require('path');
 //mysql module, allows for database access.
 var mysql = require ('mysql');
@@ -33,14 +40,14 @@ var bodyParser = require('body-parser');
 
 
 //good practice when setting up port.
-var PORT = process.env.PORT || 3003;
+var PORT = process.env.PORT || 3006;
 
 //mysql connection through mysql workbench server
 var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'ecs193@@',
-    database: 'inventory'
+    host: '' ,
+    user: '',
+    password: '',
+    database: ''
 });
 
 //connects to mysql server
@@ -58,28 +65,7 @@ var app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//data for entries. this needs to be stored in a json file that will be updated between front
-//end and backend.
-var data = [
-    {
-        id: null,
-        firstName: 'Sean',
-        lastName: 'Moody',
-        studentID: 45454545,
-        item: 'mouse',
-        qrlCode: 9382792,
-        checkOutTime: 600
-    },
-    {
-        id: null,
-        firstName: 'Weston',
-        lastName: 'Moody',
-        studentID: 78787878,
-        item: 'keyboard',
-        qrlCode: 9377777,
-        checkOutTime: 700
-    }
-];
+
 //mysql insert query function. Takes in table name, and entry of data
 var insertQuery = function(table,entry) {
     connection.query('INSERT INTO ' + table + ' SET ?', entry, function(err,res){
@@ -90,6 +76,9 @@ var insertQuery = function(table,entry) {
         console.log('Last insert ID:', res.insertId);
     })
 };
+
+//variable that needs to be encapsulated by select query. Its out here for testing purposes.
+var jsonQuery;
 //mysql select query function. Selects from a table.
 var selectQuery = function(table) {
     connection.query('SELECT * FROM ' + table,function(err,rows){
@@ -99,6 +88,7 @@ var selectQuery = function(table) {
         }
         console.log('Data received from Db:\n');
         console.log(rows);
+        jsonQuery = rows; //the jsonQuery variable from above.
     })
 };
 //mysql delete query function. Deletes from a table by id
@@ -122,38 +112,40 @@ var updateQuery = function(table,dataType,dataName,id) {
     })
 };
 
-//updateQuery('inventory', 'firstName', 'Joseph', 12);
-//insertQuery('inventory', data[0]);
-//deleteQuery('inventory',[11]);
-//selectQuery('inventory');
+//below are some hardcoded examples of querying the database that will be further implemented.
+//updateQuery('Persons', 'firstName', 'Joseph', 12);
+//insertQuery('Persons', data[0]);
+//deleteQuery('Persons',[11]);
 
 
 //this inserts into database from angular front end
 app.post('/api/entry', function(req,res,next){
     var entry = req.body;
-    insertQuery('inventory',entry);
+    insertQuery('Persons',entry);
 });
 
 
-//home, access by localhost:3000
+//home, access by localhost:3003
 //home is set up to enter in a data entry, but does not record it yet.
 app.get('/', function(req,res){
+    selectQuery('Persons');
     res.sendFile(path.join(__dirname + '/home.html'));
     console.log("/ request");
 });
 
+//this takes you to the login page at /index.html. This hasn't been implemented yet to be functional
 app.get('/login', function(req,res){
     res.sendFile(path.join(__dirname + '/index.html'));
     console.log("/login request");
 });
 
-//passes data values into /data for front end to read data and display.
+//passes jsonQuery object to the front-end. This object holds the json information of the database through selectQuery
 app.get('/data', function(req,res){
-    res.json(data);
+    res.json(jsonQuery);
     console.log("/data request");
 });
 
-//bootstrap example, access by localhost:3000/bootex
+//bootstrap example, access by localhost:3003/bootex
 app.get('/bootex', function(req,res){
     res.sendFile(path.join(__dirname + '/bootstrap.html'));
     console.log("/bootex request");
@@ -164,7 +156,7 @@ app.get('*', function(req,res){
     res.send("Error, this is not a page you are looking for");
 });
 
-//this boots up the server and listens on port 3000
+//this boots up the server and listens on port 3003
 app.listen(PORT, function() {
     console.log("Server running on " + PORT);
 });
