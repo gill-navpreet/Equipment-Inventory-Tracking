@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
 <body>
-<p>Here is an example of filling out an entry:</p>
+<p>Inventory Tracking Form:</p>
 <div ng-app="myApp" ng-controller="myCtrl">
     <form><!-- this is the form code where the user submits their information-->
         First Name: <input type="text" ng-model="firstName"><br>
@@ -13,7 +14,8 @@
         Item: <input type="text" ng-model="item"><br>
         QRL Code: <input type="text" ng-model="qrlCode"><br>
         Check out time: <input type="text" ng-model="checkOutTime"><br>
-        <input type="submit" value="Submit" ng-click="submit()">
+        <input type="submit" value="Submit" ng-click="submit()" onclick = "location.href='/'">
+        <input type="submit" value="Delete all" ng-click="delete()" onclick = "location.href='/'">
         <p>{{myTxt}}</p>
 
     </form>
@@ -29,6 +31,7 @@
     </ul>
 </div>
 </body>
+
 <script>//-uses app in div scope above and myCntl as a controller-
 var app = angular.module("myApp", []);
 app.controller("myCtrl", function($scope,$http) {//sets up controller with scope and http
@@ -56,10 +59,14 @@ app.controller("myCtrl", function($scope,$http) {//sets up controller with scope
             checkOutTime: $scope.checkOutTime
         };
         var json = JSON.stringify(obj);
-        $scope.myTxt = "Entries added to database, Refresh page to see updated database";
-        $http.post("/api/entry/", json).success(function(json,status){
+        $scope.myTxt = "Entries added to database";
+        $http.post("/insert/", json).success(function(json,status){
             console.log('Entry posted successfully');
         })
+    };
+
+    $scope.delete = function(){
+        $http.post("/delete/");
     };
 
 });
