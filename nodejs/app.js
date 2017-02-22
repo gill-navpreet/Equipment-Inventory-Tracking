@@ -23,7 +23,7 @@
  * We can experiment with bootstrap on the forms for now
  *
  * We want to separate home.html into two files. There exists a home.js, but it isn't up to date with home.html. I've
- * struggled to separate the home.html file into a .js for some reason. This should be a simple fix, but is now a priority
+ * struggled    to separate the home.html file into a .js for some reason. This should be a simple fix, but is now a priority
  *
  */
 
