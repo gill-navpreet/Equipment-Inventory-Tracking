@@ -47,10 +47,10 @@ var PORT = process.env.PORT || 3005;
 
 //mysql connection through mysql workbench server
 var connection = mysql.createConnection({
-    host: 'ecs193instancedb.chg90xdsb0jq.us-west-1.rds.amazonaws.com',
-    user: 'ecs193db',
-    password: 'Commentecs193',
-    database: 'Inventory_Tracking_193'
+    host: '',
+    user: '',
+    password: '',
+    database: ''
 });
 //connects to mysql server
 connection.connect(function(err){
