@@ -2,6 +2,7 @@
 <html>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 
 <body>
@@ -12,7 +13,7 @@
         Last Name: <input type="text" ng-model="lastName"><br>
         Student ID: <input type="text" ng-model="studentID"><br>
         Item: <input type="text" ng-model="item"><br>
-        QRL Code: <input type="text" ng-model="qrlCode"><br>
+        BAR code: <input type="text" ng-model="qrlCode" id = "barcode"><br>
         Check out time: <input type="text" ng-model="checkOutTime"><br>
         <input type="submit" value="Submit" ng-click="submit()" onclick = "location.href='/'">
         <input type="submit" value="Delete all" ng-click="delete()" onclick = "location.href='/'">
@@ -35,6 +36,11 @@
 <script>//-uses app in div scope above and myCntl as a controller-
 var app = angular.module("myApp", []);
 app.controller("myCtrl", function($scope,$http) {//sets up controller with scope and http
+
+
+    function delay(URL){
+        setTimeout( function() {window.location = URL}, 3000);
+    }
 
     //This code below retrieves    information from /data. /data holds the json information about the select query
     $scope.data = [];
@@ -71,5 +77,35 @@ app.controller("myCtrl", function($scope,$http) {//sets up controller with scope
 
 });
 </script>
-
+<script>
+$(document).ready(function() {
+    var pressed = false;
+    var chars = [];
+    $(window).keypress(function(e) {
+        if (e.which >= 48 && e.which <= 57) {
+            chars.push(String.fromCharCode(e.which));
+        }
+        console.log(e.which + ":" + chars.join("|"));
+        if (pressed == false) {
+            setTimeout(function(){
+                if (chars.length >= 10) {
+                    var barcode = chars.join("");
+                    console.log("Barcode Scanned: " + barcode);
+                    // assign value to some input (or do whatever you want)
+                    $("#barcode").val(barcode);
+                }
+                chars = [];
+                pressed = false;
+            },500);
+        }
+        pressed = true;
+    });
+});
+$("#barcode").keypress(function(e){
+    if ( e.which === 13 ) {
+        console.log("Prevent form submit.");
+        e.preventDefault();
+    }
+});
+</script>
 </html>

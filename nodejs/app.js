@@ -6,6 +6,10 @@
  * Has functions that can query database through submit buttons. Currently there are only insert and delete queries. Buttons now
  * update page when pressed and no refreshing required.
  *
+ * When you connect the USB Scanner, there is no plugin or download. The scanner acts as a keyboard input that enters the information
+ * of the barcode at a fast rate of 10 numbers or greater. Implemented jQuery code to detect an input that is of a rapid rate of a barcode
+ * scanner. It takes this input and fills the entry of the form value.
+ *
  * We have the homepage set to home.html which provides us a form to fill out user information. This information is linked to a
  * submit button which is implemented to send data to our backend through to the database.
  *
@@ -148,6 +152,7 @@ app.post('/delete', function(req,res,next){
 //home, access by localhost:3003
 //home is set up to enter in a data entry, but does not record it yet.
 app.get('/', function(req,res){
+    setTimeout(function() {}, 3000);
     selectQuery('Persons');
     res.sendFile(path.join(__dirname + '/home.html'));
     console.log("/ request");
