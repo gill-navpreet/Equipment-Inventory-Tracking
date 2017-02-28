@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<script src="jsbarcode/bin/JsBarcode.js"></script>
+<script src="jsbarcode/dist/JsBarcode.all.min.js"></script>
+<script src="jquery/dist/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+
+
+<body>
+<p>Inventory Tracking Form:</p>
+<div ng-app="myApp" ng-controller="myCtrl">
+    <form><!-- this is the form code where the user submits their information-->
+        First Name: <input type="text" ng-model="firstName"><br>
+        Last Name: <input type="text" ng-model="lastName"><br>
+        Student ID: <input type="text" ng-model="studentID"><br>
+        Item: <input type="text" ng-model="item"><br>
+        BAR code: <input type="text" ng-model="qrlCode" id = "bcode"><br>
+        Check out time: <input type="text" ng-model="checkOutTime"><br>
+        <input type="submit" value="Submit" ng-click="submit()" onclick = "location.href='/'">
+        <input type="submit" value="Delete all" ng-click="delete()" onclick = "location.href='/'">
+        <p>{{myTxt}}</p>
+
+    </form>
+    <svg id="barcode"></svg><br> <!-- barcode generator image-->
+    <input type = "text" id = inputCode><br> <!-- input for barcode generator-->
+    <ul ng-repeat="x in data"> <!-- this loops through the entries in the database and puts them on the screen-->
+        <li>
+            {{x.firstName}},
+            {{x.lastName}},
+            {{x.studentID}},
+            {{x.item}},
+            {{x.qrlCode}},
+            {{x.checkOutTime}}
+        </li>
+    </ul>
+</div>
+</body>
+
+<script>//this is the code for barcode generator entry;
+$(document).ready(function() {
+    $("#inputCode").keyup(function() {
+        var value = $("#inputCode").val();
+        JsBarcode("#barcode", value);
+    });
+
+});
+</script>
+<script>
+var app = angular.module("myApp", []);
+app.controller("myCtrl", function($scope,$http) {//sets up controller with scope and http
+
+
+    //This code below retrieves    information from /data. /data holds the json information about the select query
+    $scope.data = [];
+    var request = $http.get('/data');
+    request.success(function (data) {
+        $scope.data = data;
+    });
+    request.error(function (data) {
+        console.log('Error: ' + data);
+    });
+
+    //submit inserts into database the information that was entered in the field
+    $scope.myTxt = "Please enter all fields";
+    $scope.submit = function(){
+        var obj = {
+            id: $scope.null,
+            firstName: $scope.firstName,
+            lastName: $scope.lastName,
+            studentID: $scope.studentID,
+            item: $scope.item,
+            qrlCode: $scope.qrlCode,
+            checkOutTime: $scope.checkOutTime
+        };
+        var json = JSON.stringify(obj);
+        $scope.myTxt = "Entries added to database";
+        $http.post("/insert/", json).success(function(json,status){
+            console.log('Entry posted successfully');
+        })
+    };
+
+    $scope.delete = function(){
+        $http.post("/delete/");
+    };
+
+});
+</script>
+
+<script>
+$(document).ready(function() {
+    var pressed = false;
+    var chars = [];
+    $(window).keypress(function(e) {
+        if (e.which >= 48 && e.which <= 57) {
+            chars.push(String.fromCharCode(e.which));
+        }
+        console.log(e.which + ":" + chars.join("|"));
+        if (pressed == false) {
+            setTimeout(function(){
+                if (chars.length >= 10) {
+                    var bcode = chars.join("");
+                    JsBarcode("#barcode", bcode);
+                    console.log("Barcode Scanned: " + bcode);
+                    // assign value to some input (or do whatever you want)
+                    $("#bcode").val(bcode);
+                }
+                chars = [];
+                pressed = false;
+            },500);
+        }
+        pressed = true;
+    });
+});
+$("#bcode").keypress(function(e){
+    if ( e.which === 13 ) {
+        console.log("Prevent form submit.");
+        e.preventDefault();
+    }
+});
+</script>
+</html>
