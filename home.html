@@ -11,15 +11,15 @@
 <body>
 <p>Inventory Tracking Form:</p>
 <div ng-app="myApp" ng-controller="myCtrl">
-    <form><!-- this is the form code where the user submits their information-->
+    <form action = "/"><!-- this is the form code where the user submits their information-->
         First Name: <input type="text" ng-model="firstName"><br>
         Last Name: <input type="text" ng-model="lastName"><br>
         Student ID: <input type="text" ng-model="studentID"><br>
         Item: <input type="text" ng-model="item"><br>
         BAR code: <input type="text" ng-model="barCode" id = "bcode"><br>
         Check out time: <input type="text" ng-model="checkOutTime"><br>
-        <input type="submit" value="Submit" ng-click="submit()" onclick = "location.href='/'">
-        <input type="submit" value="Delete all" ng-click="delete()" onclick = "location.href='/'">
+        <input type="submit" value="Submit" ng-click="submit()">
+        <input type="submit" value="Delete all" ng-click="delete()">
         <p>{{myTxt}}</p>
 
     </form>
