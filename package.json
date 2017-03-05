@@ -1,0 +1,28 @@
+{
+  "name": "experiment",
+  "version": "1.0.0",
+  "description": "mean stack application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "MEAN",
+    "stack"
+  ],
+  "author": "ecs193",
+  "license": "ISC",
+  "dependencies": {
+    "angular-barcode": "^2.0.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.17.0",
+    "express": "^4.15.0",
+    "jsonwebtoken": "^7.3.0",
+    "mongoose": "^4.8.5",
+    "mongoose-title-case": "0.0.4",
+    "mongoose-validator": "^0.2.2",
+    "morgan": "^1.8.1",
+    "td-angular-barcode": "^2.0.2"
+  }
+}
